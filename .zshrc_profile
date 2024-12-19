@@ -1,0 +1,50 @@
+# Manage zsh profile changes 
+alias update="source ~/.zshrc"
+alias change="code ~/.zshrc"
+
+# Fast initialization of terraform projects
+alias terraform-planet="touch .gitignore main.tf batch.tf iam.tf"
+
+# Automatically create and activate a Python virtual environment
+function mkenv() {
+    # Check for help argument
+    if [[ "$1" == "help" || "$1" == "--help" ]]; then
+        echo "Usage: mkenv [PYTHON_VERSION]"
+        echo ""
+        echo "Automatically create and activate a Python virtual environment."
+        echo ""
+        echo "Options:"
+        echo "  PYTHON_VERSION  Specify the Python version to use (default: python3.13)."
+        echo "                  Example: python3.12, python3.11, or a full path to the binary."
+        echo "  help, --help    Show this help message."
+        return
+    fi
+
+    # Default to Python 3.13 if no argument is provided
+    local python_version="${1:-python3.13}"
+
+    # Check if the ".env" folder exists
+    if [ -d ".env" ]; then
+        if [ -n "$1" ]; then
+            echo "Warning: .env already exists, and you specified a Python version ($python_version)."
+            echo "Operation canceled to avoid overwriting the existing virtual environment."
+            return
+        else
+            echo "Activating existing virtual environment in .env..."
+            source .env/bin/activate
+            return
+        fi
+    fi
+
+    # Create the virtual environment if it doesn't exist
+    echo "Creating virtual environment using $python_version in .env..."
+    $python_version -m venv .env
+
+    # Activate the virtual environment
+    if [ -f ".env/bin/activate" ]; then
+        echo "Activating virtual environment..."
+        source .env/bin/activate
+    else
+        echo "Failed to activate .env. Ensure $python_version is correctly installed."
+    fi
+}
